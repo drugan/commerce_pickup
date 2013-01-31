@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * @file
+ * Allows you to define pickup locations for customers to choose during checkout.
+ */
+
+
+/**
+ * Implements hook_commerce_shipping_method_info().
+ */
+function commerce_pickup_commerce_shipping_method_info() {
+  $shipping_methods = array();
+
+  $shipping_methods['pickup'] = array(
+    'title' => t('Pickup locations'),
+    'description' => t('Allows you to define pickup locations for customers to choose during checkout.'),
+  );
+
+  return $shipping_methods;
+}
+
+/**
+ * Implements hook_commerce_shipping_service_info().
+ */
+function commerce_pickup_commerce_shipping_service_info() {
+  $shipping_services = array();
+
+  $shipping_services['pickup'] = array(
+    'title' => t('Pickup locations'),
+    'description' => t('A list of active pickup locations to choose from.'),
+    'display_title' => t('Pickup'),
+    'shipping_method' => 'pickup',
+    'price_component' => 'pickup',
+    'callbacks' => array(
+      'rate' => 'commerce_pickup_service_rate',
+      'details_form' => 'commerce_pickup_service_details_form',
+      'details_form_validate' => 'commerce_pickup_service_details_form_validate',
+      'details_form_submit' => 'commerce_pickup_service_details_form_submit',
+    ),
+  );
+
+  return $shipping_services;
+}
+
+/**
+ * Shipping service callback: returns a base price array for a shipping service
+ * calculated for the given order.
+ */
+function commerce_pickup_service_rate($shipping_service, $order) {
+  return array(
+    'amount' => 0,
+    'currency_code' => 'USD',
+    'data' => array(),
+  );
+}
+
+/**
+ * Shipping service callback: returns the pickup shipping service details form.
+ */
+function commerce_pickup_service_details_form($pane_form, $pane_values, $checkout_pane, $order, $shipping_service) {
+  $form = array();
+
+  $pane_values['service_details'] += array(
+    'location' => '',
+  );
+
+  $form['location'] = array(
+    '#type' => 'radios',
+    '#title' => t('Select a location...'),
+    '#description' => t(''),
+    '#options' => array(
+      'test' => t('Test location'),
+    ),
+    '#default_value' => $pane_values['service_details']['location'],
+    '#required' => TRUE,
+  );
+
+  return $form;
+}
+
+/**
+ * Shipping service callback: validates the pickup shipping service details.
+ */
+function commerce_pickup_service_details_form_validate($details_form, $details_values, $shipping_service, $order, $form_parents) {
+  // No validation...
+}
+
+/**
+ * Shipping service callback: increases the shipping line item's unit price if
+ * express delivery was selected.
+ */
+function commerce_pickup_service_details_form_submit($details_form, $details_values, $line_item) {
+  // No submit...
+}

@@ -1,0 +1,6 @@
+name = Pickup Locations
+description = Allows you to define pickup locations for customers to choose during checkout.
+package = Commerce (shipping)
+dependencies[] = commerce
+dependencies[] = commerce_shipping
+core = 7.x

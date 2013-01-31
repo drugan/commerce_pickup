@@ -94,7 +94,7 @@ function commerce_pickup_service_details_form($pane_form, $pane_values, $checkou
   );
 
   $form['location'] = array(
-    '#type' => 'radios',
+    '#type' => variable_get('commerce_pickup_location_list_element', 'radios'),
     '#title' => t('Select a location...'),
     '#description' => t(variable_get('commerce_pickup_location_list_description', '')),
     '#options' => _commerce_pickup_location_options(),

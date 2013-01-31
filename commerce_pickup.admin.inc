@@ -11,6 +11,15 @@
  */
 function commerce_pickup_settings_form($form, &$form_state) {
 
+  // Pickup shipping service display title.
+  $form['commerce_pickup_service_display_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Pickup service display title'),
+    '#description' => t('The shipping service title displayed in checkout.'),
+    '#default_value' => variable_get('commerce_pickup_service_display_title', 'Pickup'),
+    '#required' => TRUE,
+  );
+
   // Pickup locations list.
   $form['commerce_pickup_locations'] = array(
     '#type' => 'textarea',
@@ -20,13 +29,16 @@ function commerce_pickup_settings_form($form, &$form_state) {
     '#required' => TRUE,
   );
 
-  // Pickup shipping service display title.
-  $form['commerce_pickup_service_display_title'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Pickup service display title'),
-    '#description' => t('The shipping service title displayed in checkout.'),
-    '#default_value' => variable_get('commerce_pickup_service_display_title', 'Pickup'),
-    '#required' => TRUE,
+  // Location list form element.
+  $form['commerce_pickup_location_list_element'] = array(
+    '#type' => 'radios',
+    '#title' => t('Location list form element'),
+    '#description' => t('Select the form element that should be used for selecting a location in checkout.'),
+    '#options' => array(
+      'radios' => t('Radio buttons'),
+      'select' => t('Select list (dropdown)'),
+    ),
+    '#default_value' => variable_get('commerce_pickup_location_list_element', 'radios'),
   );
 
   // Location list description.

@@ -41,7 +41,7 @@ function commerce_pickup_commerce_shipping_method_info() {
   $shipping_methods = array();
 
   $shipping_methods['pickup'] = array(
-    'title' => t('Pickup locations'),
+    'title' => t('Pickup'),
     'description' => t('Allows you to define pickup locations for customers to choose during checkout.'),
   );
 
@@ -55,7 +55,7 @@ function commerce_pickup_commerce_shipping_service_info() {
   $shipping_services = array();
 
   $shipping_services['pickup'] = array(
-    'title' => t('Pickup locations'),
+    'title' => t('Pickup'),
     'description' => t('A list of active pickup locations to choose from.'),
     'display_title' => t(variable_get('commerce_pickup_service_display_title', 'Pickup')),
     'shipping_method' => 'pickup',

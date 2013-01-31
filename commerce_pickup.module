@@ -5,6 +5,34 @@
  * Allows you to define pickup locations for customers to choose during checkout.
  */
 
+/****************************************************************
+ * Drupal hooks
+ * **************************************************************/
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_pickup_menu() {
+
+  // Root Theme Settings page.
+  $items['admin/commerce/config/shipping/methods/pickup/settings'] = array(
+    'title' => 'Settings',
+    'description' => 'Commerce Pickup shipping method settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_pickup_settings_form'),
+    'access arguments' => array('administer store configuration'),
+    'file' => 'commerce_pickup.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+    'weight' => 8,
+  );
+
+  return $items;
+}
+
+/****************************************************************
+ * Commerce shipping hooks
+ * **************************************************************/
 
 /**
  * Implements hook_commerce_shipping_method_info().
@@ -29,7 +57,7 @@ function commerce_pickup_commerce_shipping_service_info() {
   $shipping_services['pickup'] = array(
     'title' => t('Pickup locations'),
     'description' => t('A list of active pickup locations to choose from.'),
-    'display_title' => t('Pickup'),
+    'display_title' => t(variable_get('commerce_pickup_service_display_title', 'Pickup')),
     'shipping_method' => 'pickup',
     'price_component' => 'pickup',
     'callbacks' => array(
@@ -68,7 +96,7 @@ function commerce_pickup_service_details_form($pane_form, $pane_values, $checkou
   $form['location'] = array(
     '#type' => 'radios',
     '#title' => t('Select a location...'),
-    '#description' => t(''),
+    '#description' => t(variable_get('commerce_pickup_location_list_description', '')),
     '#options' => array(
       'test' => t('Test location'),
     ),

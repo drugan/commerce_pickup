@@ -97,9 +97,7 @@ function commerce_pickup_service_details_form($pane_form, $pane_values, $checkou
     '#type' => 'radios',
     '#title' => t('Select a location...'),
     '#description' => t(variable_get('commerce_pickup_location_list_description', '')),
-    '#options' => array(
-      'test' => t('Test location'),
-    ),
+    '#options' => _commerce_pickup_location_options(),
     '#default_value' => $pane_values['service_details']['location'],
     '#required' => TRUE,
   );
@@ -120,4 +118,19 @@ function commerce_pickup_service_details_form_validate($details_form, $details_v
  */
 function commerce_pickup_service_details_form_submit($details_form, $details_values, $line_item) {
   // No submit...
+}
+
+/**
+ * Helper function for converting the list of locations into an array of options for a form element.
+ */
+function _commerce_pickup_location_options() {
+
+  // Load the list of locations.
+  $locations = trim(variable_get('commerce_pickup_locations', ''));
+
+  // Explode the list on newlines.
+  $options = explode("\n", $locations);
+
+  // Return the array of options.
+  return drupal_map_assoc($options);
 }

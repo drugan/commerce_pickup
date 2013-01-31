@@ -11,6 +11,15 @@
  */
 function commerce_pickup_settings_form($form, &$form_state) {
 
+  // Pickup locations list.
+  $form['commerce_pickup_locations'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Pickup locations'),
+    '#description' => t('Enter the locations you would like to make available in checkout here. One location per line.'),
+    '#default_value' => variable_get('commerce_pickup_locations', ''),
+    '#required' => TRUE,
+  );
+
   // Pickup shipping service display title.
   $form['commerce_pickup_service_display_title'] = array(
     '#type' => 'textfield',

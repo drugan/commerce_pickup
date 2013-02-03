@@ -28,7 +28,61 @@ function commerce_pickup_menu() {
 }
 
 /****************************************************************
- * Commerce shipping hooks
+ * Commerce hooks
+ * **************************************************************/
+
+/**
+ * Implements hook_entity_insert().
+ */
+function commerce_pickup_entity_insert($entity, $type) {
+
+  // If a pickup line item is being inserted...
+  if ($type == 'commerce_line_item' && $entity->type == 'shipping' && $entity->data['shipping_service']['shipping_method'] == 'pickup') {
+
+    // Generate record.
+    $record = _commerce_pickup_line_item_record($entity);
+
+    // Insert record into {commerce_pickup_line_item}.
+    drupal_write_record('commerce_pickup_line_item', $record);
+  }
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function commerce_pickup_entity_update($entity, $type) {
+
+  // If a pickup line item is being updated...
+  if ($type == 'commerce_line_item' && $entity->type == 'shipping' && $entity->data['shipping_service']['shipping_method'] == 'pickup') {
+
+    // Generate record.
+    $record = _commerce_pickup_line_item_record($entity);
+
+    // Update record in {commerce_pickup_line_item}.
+    $query = db_update('commerce_pickup_line_item');
+    $query->fields($record);
+    $query->condition('line_item_id', $entity->line_item_id);
+    $query->execute();
+  }
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function commerce_pickup_entity_delete($entity, $type) {
+
+  // If a pickup line item is being updated...
+  if ($type == 'commerce_line_item' && $entity->type == 'shipping' && $entity->data['shipping_service']['shipping_method'] == 'pickup') {
+
+    // Delete record from {commerce_pickup_line_item}.
+    $query = db_delete('commerce_pickup_line_item');
+    $query->condition('line_item_id', $entity->line_item_id);
+    $query->execute();
+  }
+}
+
+/****************************************************************
+ * Commerce shipping hooks and callbacks
  * **************************************************************/
 
 /**
@@ -60,8 +114,6 @@ function commerce_pickup_commerce_shipping_service_info() {
     'callbacks' => array(
       'rate' => 'commerce_pickup_service_rate',
       'details_form' => 'commerce_pickup_service_details_form',
-      'details_form_validate' => 'commerce_pickup_service_details_form_validate',
-      'details_form_submit' => 'commerce_pickup_service_details_form_submit',
     ),
   );
 
@@ -102,23 +154,61 @@ function commerce_pickup_service_details_form($pane_form, $pane_values, $checkou
   return $form;
 }
 
-/**
- * Shipping service callback: validates the pickup shipping service details.
- */
-function commerce_pickup_service_details_form_validate($details_form, $details_values, $shipping_service, $order, $form_parents) {
-  // No validation...
-}
+/****************************************************************
+ * Helper functions
+ * **************************************************************/
 
 /**
- * Shipping service callback: increases the shipping line item's unit price if
- * express delivery was selected.
+ * Helper function for generating a database record for the {commerce_pickup_line_item} table from a line item.
+ *
+ * @param $line_item
+ *   The line item to extract entity information from.
+ *
+ * @return
+ *   Returns a record array for insertion/update in the {commerce_pickup_line_item} table.
  */
-function commerce_pickup_service_details_form_submit($details_form, $details_values, $line_item) {
-  // No submit...
+function _commerce_pickup_line_item_record($line_item) {
+
+  // If a location was selected...
+  if (!empty($line_item->data['service_details']['location'])) {
+
+    // Split the value to get the entity type, bundle, and entity id.
+    $split = explode('__', $line_item->data['service_details']['location']);
+
+    // If three items aren't available, bail.
+    if (count($split) != 3) {
+      return;
+    }
+
+    // Grab the entity type, bundle, and entity id.
+    $entity_type = $split[0];
+    $bundle = $split[1];
+    $id = $split[2];
+
+    // Load the entity.
+    $entity = entity_load($entity_type, array($id));
+
+    // Get the entity label.
+    $label = entity_label($entity_type, reset($entity));
+
+    // Save the entity information to the database.
+    $record = array(
+      'line_item_id' => $line_item->line_item_id,
+      'entity_type' => $entity_type,
+      'entity_id' => $id,
+      'label' => $label,
+    );
+
+    // Return the record.
+    return $record;
+  }
 }
 
 /**
  * Helper function for generating a list of pickup location options.
+ *
+ * @return
+ *   Returns an array of options for use in a form element.
  */
 function _commerce_pickup_location_options() {
   $options = array();

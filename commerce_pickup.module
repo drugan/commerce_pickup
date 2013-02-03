@@ -245,8 +245,15 @@ function commerce_pickup_order_pickup_form($form, &$form_state, $order) {
     }
   }
 
-  // If a line item was found, display a form field for it.
+  // If a line item was found, display form fields for it.
   if (!empty($id)) {
+
+    // Alias the line item and store it in the form values.
+    $line_item = $line_items[$id];
+    $form['line_item'] = array(
+      '#type' => 'value',
+      '#value' => $line_item,
+    );
 
     // Load the default value from the line item.
     $default_value = $line_item->data['service_details']['location'];
@@ -275,6 +282,30 @@ function commerce_pickup_order_pickup_form($form, &$form_state, $order) {
 
   // Return the form.
   return $form;
+}
+
+/**
+ * Submit function for commerce_pickup_order_pickup_form().
+ */
+function commerce_pickup_order_pickup_form_submit($form, &$form_state) {
+
+  // If the location and line item are set...
+  if (!empty($form_state['values']['location']) && !empty($form_state['values']['line_item'])) {
+
+    // Alias the location and the line item.
+    $location = $form_state['values']['location'];
+    $line_item = $form_state['values']['line_item'];
+
+    // If the location is not equal to the original location...
+    if ($location != $line_item->data['service_details']['location']) {
+
+      // Add the new value to the line item.
+      $line_item->data['service_details']['location'] = check_plain($location);
+
+      // Save the line item (this will automatically update the record in {commerce_pickup_line_item}).
+      commerce_line_item_save($line_item);
+    }
+  }
 }
 
 /****************************************************************

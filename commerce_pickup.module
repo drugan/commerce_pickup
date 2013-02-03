@@ -24,6 +24,18 @@ function commerce_pickup_menu() {
     'file' => 'commerce_pickup.admin.inc',
   );
 
+  // Commerce pickup settings page.
+  $items['admin/commerce/orders/%commerce_order/pickup'] = array(
+    'title' => 'Pickup',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_pickup_order_pickup_form', 3),
+    'access callback' => 'commerce_pickup_order_access',
+    'access arguments' => array(3),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 15,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+
   return $items;
 }
 
@@ -151,6 +163,117 @@ function commerce_pickup_service_details_form($pane_form, $pane_values, $checkou
     '#required' => TRUE,
   );
 
+  return $form;
+}
+
+/****************************************************************
+ * Access callbacks
+ * **************************************************************/
+
+/**
+ * Access callback for /admin/commerce/orders/%/pickup
+ *
+ * Checks to see if the order has pickup line items.
+ *
+ * @param $order
+ *   The order to check.
+ *
+ * @return
+ *   Returns TRUE if the order has pickup line items, FALSE otherwise.
+ */
+function commerce_pickup_order_access($order) {
+
+  // If there are line items...
+  if (!empty($order->commerce_line_items[LANGUAGE_NONE])) {
+
+    // Generate an array of line item ids.
+    $ids = array();
+    foreach ($order->commerce_line_items[LANGUAGE_NONE] as $item) {
+      if (!empty($item['line_item_id'])) {
+        $ids[] = $item['line_item_id'];
+      }
+    }
+
+    // Load the line items.
+    $line_items = commerce_line_item_load_multiple($ids);
+
+    // Iterate through the line items.
+    if (!empty($line_items)) {
+      foreach ($line_items as $line_item) {
+
+        // If the line item is a pickup shipping service, return TRUE.
+        if ($line_item->type == 'shipping' && $line_item->data['shipping_service']['shipping_method'] == 'pickup') {
+          return TRUE;
+        }
+      }
+    }
+  }
+
+  // Otherwise, return FALSE.
+  return FALSE;
+}
+
+/****************************************************************
+ * Form functions
+ * **************************************************************/
+
+/**
+ * Pickup form in the order admin interface.
+ */
+function commerce_pickup_order_pickup_form($form, &$form_state, $order) {
+
+  // Generate an array of line item ids.
+  $ids = array();
+  foreach ($order->commerce_line_items[LANGUAGE_NONE] as $item) {
+    if (!empty($item['line_item_id'])) {
+      $ids[] = $item['line_item_id'];
+    }
+  }
+
+  // Load the line items.
+  $line_items = commerce_line_item_load_multiple($ids);
+
+  // Iterate through the line items to find the pickup one.
+  // At the moment we're assuming that only one pickup location is chosen, but in
+  // the future it would be nice to be able to support multiple (per-product perhaps).
+  // Right now, we just grab the last one.
+  foreach ($line_items as $key => $line_item) {
+
+    // If the line item is a pickup shipping service, return TRUE.
+    if ($line_item->type == 'shipping' && $line_item->data['shipping_service']['shipping_method'] == 'pickup') {
+      $id = $key;
+    }
+  }
+
+  // If a line item was found, display a form field for it.
+  if (!empty($id)) {
+
+    // Load the default value from the line item.
+    $default_value = $line_item->data['service_details']['location'];
+
+    // Pickup location
+    $form['location'] = array(
+      '#type' => variable_get('commerce_pickup_location_list_element', 'radios'),
+      '#title' => t('Select a location...'),
+      '#description' => t('This is the pickup location chosen by the customer.'),
+      '#options' => _commerce_pickup_location_options(),
+      '#default_value' => $default_value,
+      '#required' => TRUE,
+    );
+
+    // Submit button
+    $form['actions']['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save'),
+    );
+  }
+
+  // Link back to the order view.
+  $form['actions']['back'] = array(
+    '#markup' => l(t('Cancel'), 'admin/commerce/orders/' . $order->order_id),
+  );
+
+  // Return the form.
   return $form;
 }
 

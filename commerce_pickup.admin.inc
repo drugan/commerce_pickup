@@ -13,15 +13,12 @@ function commerce_pickup_settings_form($form, &$form_state) {
 
   // Generate an array of bundles with addressfields.
   $options = array();
-  foreach (field_info_fields() as $field_name => $field) {
-    if ($field['type'] == 'addressfield' && !empty($field['bundles'])) {
-      foreach ($field['bundles'] as $entity_type => $bundles) {
-        if (!empty($bundles)) {
-          foreach ($bundles as $bundle_name) {
-            // Prefix the bundle name with the entity type.
-            $options[$entity_type][$entity_type . '__' . $bundle_name] = $bundle_name;
-          }
-        }
+  $options = array();
+  foreach (entity_get_info() as $entity_type => $entity) {
+    if (!empty($entity['fieldable']) && $entity_type != 'group') {
+      foreach($entity['bundles'] as $bundle_name => $bundle) {
+        // Prefix the bundle name with the entity type.
+        $options[$entity_type][$entity_type . '__' .$bundle_name] = check_plain($bundle['label']);
       }
     }
   }

@@ -14,7 +14,7 @@
  */
 function commerce_pickup_menu() {
 
-  // Root Theme Settings page.
+  // Commerce pickup settings page.
   $items['admin/commerce/config/pickup'] = array(
     'title' => 'Pickup Settings',
     'description' => 'Commerce Pickup shipping method settings.',

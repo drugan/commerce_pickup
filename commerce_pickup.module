@@ -185,5 +185,5 @@ function _commerce_pickup_location_options() {
   }
 
   // Return the array of options.
-  return drupal_map_assoc($options);
+  return $options;
 }

@@ -11,21 +11,37 @@
  */
 function commerce_pickup_settings_form($form, &$form_state) {
 
+  // Generate an array of bundles with addressfields.
+  $options = array();
+  foreach (field_info_fields() as $field_name => $field) {
+    if ($field['type'] == 'addressfield' && !empty($field['bundles'])) {
+      foreach ($field['bundles'] as $entity_type => $bundles) {
+        if (!empty($bundles)) {
+          foreach ($bundles as $bundle_name) {
+            // Prefix the bundle name with the entity type.
+            $options[$entity_type][$entity_type . '__' . $bundle_name] = $bundle_name;
+          }
+        }
+      }
+    }
+  }
+
+  // Pickup location bundle.
+  $form['commerce_pickup_location_entity'] = array(
+    '#type' => 'select',
+    '#title' => t('Pickup location bundle'),
+    '#description' => t('Select the entity bundle you would like to use for pickup locations. Note: only bundles with an !addressfield are listed.', array('!addressfield' => l(t('Addressfield'), 'http://drupal.org/project/addressfield'))),
+    '#options' => $options,
+    '#default_value' => variable_get('commerce_pickup_location_entity', NULL),
+    '#required' => TRUE,
+  );
+
   // Pickup shipping service display title.
   $form['commerce_pickup_service_display_title'] = array(
     '#type' => 'textfield',
     '#title' => t('Pickup service display title'),
     '#description' => t('Specify how you would like the pickup service to appear in checkout and in the order line item.'),
     '#default_value' => variable_get('commerce_pickup_service_display_title', 'Pickup'),
-    '#required' => TRUE,
-  );
-
-  // Pickup locations list.
-  $form['commerce_pickup_locations'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Pickup locations'),
-    '#description' => t('Enter the locations you would like to make available in checkout here. One location per line.'),
-    '#default_value' => variable_get('commerce_pickup_locations', ''),
     '#required' => TRUE,
   );
 

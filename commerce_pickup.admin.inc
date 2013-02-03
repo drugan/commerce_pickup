@@ -15,7 +15,7 @@ function commerce_pickup_settings_form($form, &$form_state) {
   $form['commerce_pickup_service_display_title'] = array(
     '#type' => 'textfield',
     '#title' => t('Pickup service display title'),
-    '#description' => t('The shipping service title displayed in checkout.'),
+    '#description' => t('Specify how you would like the pickup service to appear in checkout and in the order line item.'),
     '#default_value' => variable_get('commerce_pickup_service_display_title', 'Pickup'),
     '#required' => TRUE,
   );

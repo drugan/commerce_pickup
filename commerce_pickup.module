@@ -118,15 +118,65 @@ function commerce_pickup_service_details_form_submit($details_form, $details_val
 }
 
 /**
- * Helper function for converting the list of locations into an array of options for a form element.
+ * Helper function for generating a list of pickup location options.
  */
 function _commerce_pickup_location_options() {
+  $options = array();
 
-  // Load the list of locations.
-  $locations = trim(variable_get('commerce_pickup_locations', ''));
+  // Load the entity/bundle type setting.
+  $entity_bundle = variable_get('commerce_pickup_location_entity', NULL);
+  if ($entity_bundle) {
 
-  // Explode the list on newlines.
-  $options = explode("\n", $locations);
+    // Split the entity/bundle into two separate variables.
+    $split = explode('__', $entity_bundle);
+    if (count($split == 2)) {
+      $entity_type = $split[0];
+      $bundle = $split[1];
+    }
+  }
+
+  // If an entity and bundle were found, load all entities.
+  if (!empty($entity_type) && !empty($bundle)) {
+
+    // Start a new Entity Field Query.
+    $query = new EntityFieldQuery();
+
+    // Set the entity type and bundle.
+    $query->entityCondition('entity_type', $entity_type);
+    $query->entityCondition('bundle', $bundle);
+
+    // Execute the query.
+    $result = $query->execute();
+
+    // Iterate through the results to build a list of entity titles.
+    if (!empty($result)) {
+      foreach ($result as $entity_type => $entities) {
+
+        // If there are entities...
+        if (!empty($entities)) {
+
+          // Load entity info.
+          $entity_info = entity_get_info($entity_type);
+
+          // Iterate through the entities.
+          foreach ($entities as $entity_id => $data) {
+
+            // Get the entity id.
+            $id = $data->$entity_info['entity keys']['id'];
+
+            // Load the entities.
+            $loaded_entities = entity_load($entity_type, array($id));
+
+            // Alias the first (and only) entity.
+            $entity = reset($loaded_entities);
+
+            // Add an option for the entity (using the entity's label).
+            $options[$entity_bundle . '__' . $id] = entity_label($entity_type, $entity);
+          }
+        }
+      }
+    }
+  }
 
   // Return the array of options.
   return drupal_map_assoc($options);

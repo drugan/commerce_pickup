@@ -24,7 +24,7 @@ function commerce_pickup_menu() {
     'file' => 'commerce_pickup.admin.inc',
   );
 
-  // Commerce pickup settings page.
+  // Pickup tab in admin order interface.
   $items['admin/commerce/orders/%commerce_order/pickup'] = array(
     'title' => 'Pickup',
     'page callback' => 'drupal_get_form',

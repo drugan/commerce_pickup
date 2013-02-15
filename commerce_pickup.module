@@ -321,6 +321,34 @@ function _commerce_pickup_order_line_item($order) {
 }
 
 /**
+ * Helper function for parsing a pickup location value string.
+ * Values will be in the form: [entity-type]__[bundle]__[entity-id]
+ *
+ * @param $value
+ *   The pickup location value string to parse
+ *
+ * @return
+ *   Returns an array with keys: 'entity_type', 'bundle', and 'id'.
+ */
+function _commerce_pickup_parse_location($value) {
+
+  // Split the value to get the entity type, bundle, and entity id.
+  $split = explode('__', $value);
+
+  // If three items aren't available, bail.
+  if (count($split) != 3) {
+    return;
+  }
+
+  // Return an array of values.
+  return array(
+    'entity_type' => $split[0],
+    'bundle' => $split[1],
+    'id' => $split[2],
+  );
+}
+
+/**
  * Helper function for generating a database record for the {commerce_pickup_line_item} table from a line item.
  *
  * @param $line_item
@@ -334,30 +362,25 @@ function _commerce_pickup_line_item_record($line_item) {
   // If a location was selected...
   if (!empty($line_item->data['service_details']['location'])) {
 
-    // Split the value to get the entity type, bundle, and entity id.
-    $split = explode('__', $line_item->data['service_details']['location']);
+    // Parse pickup location value.
+    $data = _commerce_pickup_parse_location($line_item->data['service_details']['location']);
 
-    // If three items aren't available, bail.
-    if (count($split) != 3) {
+    // If the data is not available, bail.
+    if (empty($data)) {
       return;
     }
 
-    // Grab the entity type, bundle, and entity id.
-    $entity_type = $split[0];
-    $bundle = $split[1];
-    $id = $split[2];
-
     // Load the entity.
-    $entity = entity_load($entity_type, array($id));
+    $entity = entity_load($data['entity_type'], array($data['id']));
 
     // Get the entity label.
-    $label = entity_label($entity_type, reset($entity));
+    $label = entity_label($data['entity_type'], reset($entity));
 
     // Save the entity information to the database.
     $record = array(
       'line_item_id' => $line_item->line_item_id,
-      'entity_type' => $entity_type,
-      'entity_id' => $id,
+      'entity_type' => $data['entity_type'],
+      'entity_id' => $data['id'],
       'label' => $label,
     );
 

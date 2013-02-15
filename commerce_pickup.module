@@ -183,30 +183,12 @@ function commerce_pickup_service_details_form($pane_form, $pane_values, $checkou
  */
 function commerce_pickup_order_access($order) {
 
-  // If there are line items...
-  if (!empty($order->commerce_line_items[LANGUAGE_NONE])) {
+  // Get the order's pickup line item.
+  $line_item = _commerce_pickup_order_line_item($order);
 
-    // Generate an array of line item ids.
-    $ids = array();
-    foreach ($order->commerce_line_items[LANGUAGE_NONE] as $item) {
-      if (!empty($item['line_item_id'])) {
-        $ids[] = $item['line_item_id'];
-      }
-    }
-
-    // Load the line items.
-    $line_items = commerce_line_item_load_multiple($ids);
-
-    // Iterate through the line items.
-    if (!empty($line_items)) {
-      foreach ($line_items as $line_item) {
-
-        // If the line item is a pickup shipping service, return TRUE.
-        if ($line_item->type == 'shipping' && $line_item->data['shipping_service']['shipping_method'] == 'pickup') {
-          return TRUE;
-        }
-      }
-    }
+  // If there is a pickup line item, return TRUE.
+  if (!empty($line_item)) {
+    return TRUE;
   }
 
   // Otherwise, return FALSE.
@@ -222,34 +204,13 @@ function commerce_pickup_order_access($order) {
  */
 function commerce_pickup_order_pickup_form($form, &$form_state, $order) {
 
-  // Generate an array of line item ids.
-  $ids = array();
-  foreach ($order->commerce_line_items[LANGUAGE_NONE] as $item) {
-    if (!empty($item['line_item_id'])) {
-      $ids[] = $item['line_item_id'];
-    }
-  }
-
-  // Load the line items.
-  $line_items = commerce_line_item_load_multiple($ids);
-
-  // Iterate through the line items to find the pickup one.
-  // At the moment we're assuming that only one pickup location is chosen, but in
-  // the future it would be nice to be able to support multiple (per-product perhaps).
-  // Right now, we just grab the last one.
-  foreach ($line_items as $key => $line_item) {
-
-    // If the line item is a pickup shipping service, return TRUE.
-    if ($line_item->type == 'shipping' && $line_item->data['shipping_service']['shipping_method'] == 'pickup') {
-      $id = $key;
-    }
-  }
+  // Get the order's pickup line item.
+  $line_item = _commerce_pickup_order_line_item($order);
 
   // If a line item was found, display form fields for it.
-  if (!empty($id)) {
+  if (!empty($line_item)) {
 
-    // Alias the line item and store it in the form values.
-    $line_item = $line_items[$id];
+    // Store the line item in the form values.
     $form['line_item'] = array(
       '#type' => 'value',
       '#value' => $line_item,
@@ -311,6 +272,53 @@ function commerce_pickup_order_pickup_form_submit($form, &$form_state) {
 /****************************************************************
  * Helper functions
  * **************************************************************/
+
+/**
+ * Helper function for extracting a pickup line item from an order.
+ *
+ * @todo
+ *   At the moment we're assuming that only one pickup location is chosen, but in
+ *   the future it would be nice to be able to support multiple (per-product perhaps).
+ *   Right now, we just grab the last one.
+ *
+ * @param $order
+ *   The Commerce Order object to look through.
+ *
+ * @return
+ *   Returns a loaded Commerce Line Item object, NULL otherwise.
+ */
+function _commerce_pickup_order_line_item($order) {
+
+  // If there are no line items, bail.
+  if (empty($order->commerce_line_items)) {
+    return;
+  }
+
+  // Generate an array of line item ids.
+  $ids = array();
+  foreach ($order->commerce_line_items[LANGUAGE_NONE] as $item) {
+    if (!empty($item['line_item_id'])) {
+      $ids[] = $item['line_item_id'];
+    }
+  }
+
+  // Load the line item objects.
+  $line_items = commerce_line_item_load_multiple($ids);
+
+  // Iterate through the line items to find the last pickup one.
+  foreach ($line_items as $key => $line_item) {
+
+    // If the line item is a pickup shipping service, remember it.
+    if ($line_item->type == 'shipping' && $line_item->data['shipping_service']['shipping_method'] == 'pickup') {
+      $id = $key;
+    }
+  }
+
+  // If an id was found, return the line item.
+  if (!empty($id)) {
+    return $line_items[$id];
+  }
+}
 
 /**
  * Helper function for generating a database record for the {commerce_pickup_line_item} table from a line item.

@@ -1,4 +1,4 @@
-name = Pickup
+name = Commerce Pickup
 description = Allows you to define pickup locations for customers to choose during checkout.
 package = Commerce (shipping)
 dependencies[] = commerce

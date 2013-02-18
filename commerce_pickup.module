@@ -451,8 +451,13 @@ function _commerce_pickup_location_options() {
             // Load the entity uri.
             $entity_uri = entity_uri($entity_type, $entity);
 
-            // Add an option for the entity (using the entity's label).
-            $options[$entity_bundle . '__' . $id] = l($entity_label, $entity_uri['path']);
+            // Add an option for the entity (using the entity's label). If it's a radio list, display it as a link.
+            if (variable_get('commerce_pickup_location_list_element', 'radios') == 'radios') {
+              $options[$entity_bundle . '__' . $id] = l($entity_label, $entity_uri['path']);
+            }
+            else {
+              $options[$entity_bundle . '__' . $id] = $entity_label;
+            }
           }
         }
       }

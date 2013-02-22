@@ -150,16 +150,24 @@ function commerce_pickup_service_rate($shipping_service, $order) {
 function commerce_pickup_service_details_form($pane_form, $pane_values, $checkout_pane, $order, $shipping_service) {
   $form = array();
 
+  // Add the pickup location to the service details array.
   $pane_values['service_details'] += array(
     'location' => '',
   );
 
+  // Load the pickup location options.
+  $options = _commerce_pickup_location_options();
+
+  // Alias the default value.
+  $default_value = $pane_values['service_details']['location'];
+
+  // Location selection field.
   $form['location'] = array(
     '#type' => variable_get('commerce_pickup_location_list_element', 'radios'),
     '#title' => t('Select a location...'),
     '#description' => t(variable_get('commerce_pickup_location_list_description', '')),
-    '#options' => _commerce_pickup_location_options(),
-    '#default_value' => $pane_values['service_details']['location'],
+    '#options' => $options,
+    '#default_value' => !empty($default_value) ? $default_value : reset(array_keys($options)),
     '#required' => TRUE,
   );
 

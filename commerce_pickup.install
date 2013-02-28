@@ -12,24 +12,35 @@ function commerce_pickup_schema() {
   $schema['commerce_pickup_line_item'] = array(
     'description' => 'Maintains a link between a pickup line item and a pickup location entity.',
     'fields' => array(
+
+      // Unique id of the pickup line item.
       'line_item_id' => array(
         'description' => 'The id of the line item this pickup pertains to.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
+
+      // The pickup location entity type.
       'entity_type' => array(
         'description' => 'The pickup location entity type.',
         'type' => 'varchar',
         'length' => '128',
         'not null' => FALSE,
       ),
+
+      // The pickup location entity id.
       'entity_id' => array(
         'description' => 'The pickup location entity id.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
       ),
+
+      // The label field is used to store the label of the entity
+      // at the time that it was selected. This is useful if your
+      // entities change their names, or are removed entirely, and
+      // you want to make sure you don't lose the old label.
       'label' => array(
         'description' => 'The pickup location entity label.',
         'type' => 'varchar',

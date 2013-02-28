@@ -143,7 +143,7 @@ function commerce_pickup_commerce_shipping_service_info() {
 function commerce_pickup_service_rate($shipping_service, $order) {
   return array(
     'amount' => 0,
-    'currency_code' => 'USD',
+    'currency_code' => commerce_default_currency(),
     'data' => array(),
   );
 }

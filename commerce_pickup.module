@@ -121,17 +121,74 @@ function commerce_pickup_commerce_shipping_method_info() {
 function commerce_pickup_commerce_shipping_service_info() {
   $shipping_services = array();
 
-  $shipping_services['pickup'] = array(
-    'title' => t('Pickup'),
-    'description' => t('A list of active pickup locations to choose from.'),
-    'display_title' => t(variable_get('commerce_pickup_service_display_title', 'Pickup')),
-    'shipping_method' => 'pickup',
-    'price_component' => 'pickup',
-    'callbacks' => array(
-      'rate' => 'commerce_pickup_service_rate',
-      'details_form' => 'commerce_pickup_service_details_form',
-    ),
-  );
+  // Load the entity/bundle type setting.
+  $entity_bundle = variable_get('commerce_pickup_location_entity', NULL);
+  if ($entity_bundle) {
+
+    // Split the entity/bundle into two separate variables.
+    $split = explode('__', $entity_bundle);
+    if (count($split == 2)) {
+      $entity_type = $split[0];
+      $bundle = $split[1];
+    }
+  }
+
+  // If an entity type and bundle are not available, bail.
+  if (empty($entity_type) || empty($bundle)) {
+    return $shipping_services;
+  }
+
+  // Start a new Entity Field Query.
+  $query = new EntityFieldQuery();
+
+  // Set the entity type and bundle.
+  $query->entityCondition('entity_type', $entity_type);
+  $query->entityCondition('bundle', $bundle);
+
+  // Execute the query.
+  $result = $query->execute();
+
+  // Iterate through the results to build a list of shipping services.
+  if (!empty($result)) {
+    foreach ($result as $entity_type => $entities) {
+
+      // If there are entities...
+      if (!empty($entities)) {
+
+        // Load entity info.
+        $entity_info = entity_get_info($entity_type);
+
+        // Iterate through the entities.
+        foreach ($entities as $id => $data) {
+
+          // Load the entities.
+          $loaded_entities = entity_load($entity_type, array($id));
+
+          // Alias the first (and only) entity.
+          $entity = reset($loaded_entities);
+
+          // Load the entity label.
+          $label = entity_label($entity_type, $entity);
+
+          // Load the display title of the pickup services.
+          $pickup_title = variable_get('commerce_pickup_service_display_title', 'Pickup');
+
+          // Define the shipping service for this location.
+          $shipping_services['commerce_pickup__' . $bundle . '__' . $id] = array(
+            'title' => t('@pickup', array('@pickup' => $pickup_title)),
+            'description' => t('@pickup at @location', array('@pickup' => $pickup_title, '@location' => $label)),
+            'display_title' => t('@pickup at @location', array('@pickup' => $pickup_title, '@location' => $label)),
+            'shipping_method' => 'pickup',
+            'price_component' => 'pickup',
+            'callbacks' => array(
+              'rate' => 'commerce_pickup_service_rate',
+              'details_form' => 'commerce_pickup_service_details_form',
+            ),
+          );
+        }
+      }
+    }
+  }
 
   return $shipping_services;
 }

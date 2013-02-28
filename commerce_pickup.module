@@ -228,15 +228,36 @@ function commerce_pickup_order_pickup_form($form, &$form_state, $order) {
       '#value' => $line_item,
     );
 
+    // Load the available pickup location options.
+    $options = _commerce_pickup_location_options();
+
     // Load the default value from the line item.
     $default_value = $line_item->data['service_details']['location'];
+
+    // If the selected pickup location does not exist in the options, add it.
+    // This covers the situations where pickup location entities have changed,
+    // or been deleted. We want the selected location to remain, even if the
+    // entity that it came from is gone (for reporting purposes).
+    if (!array_key_exists($default_value, $options)) {
+
+      // Load the pickup location label from the database.
+      $query = db_select('commerce_pickup_line_item', 'p');
+      $query->addField('p', 'label');
+      $query->condition('line_item_id', $line_item->line_item_id);
+      $label = $query->execute()->fetchField();
+
+      $defaults = array(
+        $default_value => $label . ' ' . t('(no longer exists)'),
+      );
+      $options = array_merge($defaults, $options);
+    }
 
     // Pickup location
     $form['location'] = array(
       '#type' => variable_get('commerce_pickup_location_list_element', 'radios'),
       '#title' => t('Select a location...'),
       '#description' => t('This is the pickup location chosen by the customer.'),
-      '#options' => _commerce_pickup_location_options(),
+      '#options' => $options,
       '#default_value' => $default_value,
       '#required' => TRUE,
     );

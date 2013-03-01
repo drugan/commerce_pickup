@@ -6,52 +6,41 @@
  */
 
 /**
- * Implements hook_schema().
+ * Update to use individual shipping services.
  */
-function commerce_pickup_schema() {
-  $schema['commerce_pickup_line_item'] = array(
-    'description' => 'Maintains a link between a pickup line item and a pickup location entity.',
-    'fields' => array(
+function commerce_pickup_update_7000(&$sandbox) {
 
-      // Unique id of the pickup line item.
-      'line_item_id' => array(
-        'description' => 'The id of the line item this pickup pertains to.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
+  // Originally, this module provided a single shipping service.
+  // This code updates it to a new scheme whereby a shipping service
+  // is provided for each pickup location entity.
 
-      // The pickup location entity type.
-      'entity_type' => array(
-        'description' => 'The pickup location entity type.',
-        'type' => 'varchar',
-        'length' => '128',
-        'not null' => FALSE,
-      ),
+  // Load all entries from the {commerce_pickup_line_item} table.
+  $query = db_select('commerce_pickup_line_item', 'p');
+  $query->fields('p');
+  $results = $query->execute();
 
-      // The pickup location entity id.
-      'entity_id' => array(
-        'description' => 'The pickup location entity id.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => FALSE,
-      ),
+  // Iterate through the results.
+  foreach ($results as $result) {
 
-      // The label field is used to store the label of the entity
-      // at the time that it was selected. This is useful if your
-      // entities change their names, or are removed entirely, and
-      // you want to make sure you don't lose the old label.
-      'label' => array(
-        'description' => 'The pickup location entity label.',
-        'type' => 'varchar',
-        'length' => '255',
-        'not null' => FALSE,
-      ),
-    ),
-    'indexes' => array(
-      'entity' => array('entity_type', 'entity_id'),
-      'line_item_id' => array('line_item_id'),
-    ),
-  );
-  return $schema;
+    // Load the line item.
+    $line_item = commerce_line_item_load($result->line_item_id);
+
+    // Load the display title of the pickup services.
+    $pickup_title = variable_get('commerce_pickup_service_display_title', 'Pickup');
+
+    // Set the line item label to the new format.
+    $line_item->line_item_label = t('@pickup at @location', array('@pickup' => $pickup_title, '@location' => $result->label));
+
+    // Save the line item.
+    commerce_line_item_save($line_item);
+  }
+
+  // Remove the old database table.
+  db_drop_table('commerce_pickup_line_item');
+
+  // Rebuild the menus.
+  menu_rebuild();
+
+  // Return a message.
+  return t('Commerce Pickup has been updated to use individual shipping services.');
 }

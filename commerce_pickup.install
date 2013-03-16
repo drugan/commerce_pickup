@@ -6,6 +6,18 @@
  */
 
 /**
+ * Implements hook_uninstall().
+ */
+function commerce_pickup_uninstall() {
+
+  // Delete variables.
+  variable_del('commerce_pickup_location_entity');
+  variable_del('commerce_pickup_service_display_title');
+  variable_del('commerce_pickup_location_list_element');
+  variable_del('commerce_pickup_location_list_description');
+}
+
+/**
  * Update to use individual shipping services.
  */
 function commerce_pickup_update_7000(&$sandbox) {

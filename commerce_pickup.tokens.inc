@@ -57,7 +57,7 @@ function commerce_pickup_tokens($type, $tokens, array $data = array(), array $op
       }
 
       // Parse the location value.
-      $location = _commerce_pickup_parse_location($line_item->data['service_details']['location']);
+      $location = _commerce_pickup_parse_location($line_item->data['shipping_service']['name']);
 
       // If there's no location data, bail.
       if (empty($location)) {

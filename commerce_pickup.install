@@ -6,6 +6,57 @@
  */
 
 /**
+ * Implements hook_schema().
+ */
+function commerce_pickup_schema() {
+  $schema['commerce_pickup_line_item'] = array(
+    'description' => 'Maintains a link between a pickup line item and a pickup location entity.',
+    'fields' => array(
+
+      // Unique id of the pickup line item.
+      'line_item_id' => array(
+        'description' => 'The id of the line item this pickup pertains to.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+
+      // The pickup location entity type.
+      'entity_type' => array(
+        'description' => 'The pickup location entity type.',
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => FALSE,
+      ),
+
+      // The pickup location entity id.
+      'entity_id' => array(
+        'description' => 'The pickup location entity id.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+
+      // The label field is used to store the label of the entity
+      // at the time that it was selected. This is useful if your
+      // entities change their names, or are removed entirely, and
+      // you want to make sure you don't lose the old label.
+      'label' => array(
+        'description' => 'The pickup location entity label.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => FALSE,
+      ),
+    ),
+    'indexes' => array(
+      'line_item_id' => array('line_item_id'),
+      'entity' => array('entity_type', 'entity_id'),
+    ),
+  );
+  return $schema;
+}
+
+/**
  * Implements hook_uninstall().
  */
 function commerce_pickup_uninstall() {
@@ -55,4 +106,49 @@ function commerce_pickup_update_7000(&$sandbox) {
 
   // Return a message.
   return t('Commerce Pickup has been updated to use individual shipping services.');
+}
+
+/**
+ * Create the commerce_pickup_line_item table.
+ */
+function commerce_pickup_update_7001(&$sandbox) {
+
+  // Add the {commerce_pickup_line_item} database table.
+  $schema = array(
+    'description' => 'Maintains a link between a pickup line item and a pickup location entity.',
+    'fields' => array(
+      'line_item_id' => array(
+        'description' => 'The id of the line item this pickup pertains to.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'entity_type' => array(
+        'description' => 'The pickup location entity type.',
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => FALSE,
+      ),
+      'entity_id' => array(
+        'description' => 'The pickup location entity id.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'label' => array(
+        'description' => 'The pickup location entity label.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => FALSE,
+      ),
+    ),
+    'indexes' => array(
+      'line_item_id' => array('line_item_id'),
+      'entity' => array('entity_type', 'entity_id'),
+    ),
+  );
+  db_create_table('commerce_pickup_line_item', $schema);
+
+  // Return a message.
+  return t('Commerce Pickup Line Item table created.');
 }

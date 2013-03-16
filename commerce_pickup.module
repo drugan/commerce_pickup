@@ -188,6 +188,20 @@ function commerce_pickup_service_rate($shipping_service, $order) {
   );
 }
 
+/***************************************************************
+ * Views API hooks
+ * *************************************************************/
+
+/**
+ * Implements hook_views_api().
+ */
+function commerce_pickup_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'commerce_pickup') . '/views',
+  );
+}
+
 /****************************************************************
  * Helper functions
  * **************************************************************/

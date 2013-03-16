@@ -27,7 +27,7 @@ function commerce_pickup_settings_form($form, &$form_state) {
   $form['commerce_pickup_location_entity'] = array(
     '#type' => 'select',
     '#title' => t('Pickup location bundle'),
-    '#description' => t('Select the entity bundle you would like to use for pickup locations.'),
+    '#description' => t('Select the entity bundle you would like to use for pickup locations. WARNING: Changing this after pickup locations have been used in orders will have weird side-effects with the pickup location field in Views.'),
     '#options' => $options,
     '#default_value' => variable_get('commerce_pickup_location_entity', NULL),
     '#required' => TRUE,

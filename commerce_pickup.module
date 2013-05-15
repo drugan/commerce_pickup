@@ -163,7 +163,6 @@ function commerce_pickup_commerce_shipping_service_info() {
             'description' => t('Customer will pick up at @location', array('@location' => $label)),
             'display_title' => t('@pickup at @location', array('@pickup' => $pickup_title, '@location' => $label)),
             'shipping_method' => 'pickup',
-            'price_component' => 'pickup',
             'callbacks' => array(
               'rate' => 'commerce_pickup_service_rate',
             ),

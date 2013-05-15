@@ -152,3 +152,124 @@ function commerce_pickup_update_7001(&$sandbox) {
   // Return a message.
   return t('Commerce Pickup Line Item table created.');
 }
+
+/**
+ * Fix price components in existing line items.
+ */
+function commerce_pickup_update_7002(&$sandbox) {
+
+  // Use the $sandbox to store the information needed to track progression between successive calls.
+  if (!isset($sandbox['progress'])) {
+
+    // Initialize the progress counter.
+    $sandbox['progress'] = 0;
+
+    // Count the number of line items in total.
+    $query = db_select('commerce_line_item', 'cli');
+    $query->addField('cli', 'line_item_id');
+    $query->condition('type', 'shipping');
+    $sandbox['max'] = $query->countQuery()->execute()->fetchField();
+  }
+
+  // Update 50 at a time.
+  $limit = 50;
+
+  // Retrieve the next group of line items.
+  $query = db_select('commerce_line_item', 'cli');
+  $query->fields('cli');
+  $query->condition('type', 'shipping');
+  $query->range($sandbox['progress'], $limit);
+  $result = $query->execute();
+
+  // Process the next chunk.
+  foreach ($result as $line_item) {
+
+    // Increment the progress counter.
+    $sandbox['progress']++;
+
+    // If the line item doesn't have a line item id, skip it.
+    if (empty($line_item->line_item_id)) {
+      continue;
+    }
+
+    // Unserialize the data.
+    $line_item->data = unserialize($line_item->data);
+
+    // If the line item isn't from the pickup module, skip it.
+    if (!empty($line_item->data['shipping_service']['module']) && $line_item->data['shipping_service']['module'] != 'commerce_pickup') {
+      continue;
+    }
+
+    // If the line item doesn't have a price component, skip it.
+    if (empty($line_item->data['shipping_service']['price_component'])) {
+      continue;
+    }
+
+    // Delete the price component.
+    unset($line_item->data['shipping_service']['price_component']);
+
+    // Save the line item record.
+    drupal_write_record('commerce_line_item', $line_item, array('line_item_id'));
+
+    // Load the line item total records from {field_data_commerce_total}.
+    $query = db_select('field_data_commerce_total', 'fdct');
+    $query->fields('fdct');
+    $query->condition('entity_type', 'commerce_line_item');
+    $query->condition('bundle', 'shipping');
+    $query->condition('entity_id', $line_item->line_item_id);
+    $result = $query->execute();
+
+    // Process all the line item total records.
+    foreach ($result as $line_item_total) {
+
+      // Unserialize the data.
+      $line_item_total->commerce_total_data = unserialize($line_item_total->commerce_total_data);
+
+      // Iterate through the components.
+      if (!empty($line_item_total->commerce_total_data['components'])) {
+        foreach ($line_item_total->commerce_total_data['components'] as &$component) {
+
+          // If the componenet name is 'pickup', replace it with the new name.
+          if ($component['name'] == 'pickup') {
+            $component['name'] = $line_item->data['shipping_service']['name'];
+          }
+        }
+      }
+
+      // Save the record.
+      drupal_write_record('field_data_commerce_total', $line_item_total, array('entity_type', 'entity_id', 'deleted', 'delta', 'language'));
+    }
+
+    // Load the line item total revision records from {field_revision_commerce_total}.
+    $query = db_select('field_revision_commerce_total', 'frct');
+    $query->fields('frct');
+    $query->condition('entity_type', 'commerce_line_item');
+    $query->condition('bundle', 'shipping');
+    $query->condition('entity_id', $line_item->line_item_id);
+    $result = $query->execute();
+
+    // Process all the line item revision total records.
+    foreach ($result as $line_item_rev_total) {
+
+      // Unserialize the data.
+      $line_item_rev_total->commerce_total_data = unserialize($line_item_rev_total->commerce_total_data);
+
+      // Iterate through the components.
+      if (!empty($line_item_rev_total->commerce_total_data['components'])) {
+        foreach ($line_item_rev_total->commerce_total_data['components'] as &$component) {
+
+          // If the componenet name is 'pickup', replace it with the new name.
+          if ($component['name'] == 'pickup') {
+            $component['name'] = $line_item->data['shipping_service']['name'];
+          }
+        }
+      }
+
+      // Save the record.
+      drupal_write_record('field_data_commerce_total', $line_item_total, array('entity_type', 'entity_id', 'revision_id', 'deleted', 'delta', 'language'));
+    }
+  }
+
+  // Determine if we're finished or not.
+  $sandbox['#finished'] = $sandbox['progress'] / $sandbox['max'];
+}

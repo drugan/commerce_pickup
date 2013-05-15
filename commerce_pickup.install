@@ -273,3 +273,124 @@ function commerce_pickup_update_7002(&$sandbox) {
   // Determine if we're finished or not.
   $sandbox['#finished'] = $sandbox['progress'] / $sandbox['max'];
 }
+
+/**
+ * Fix price components in existing order totals.
+ */
+function commerce_pickup_update_7003(&$sandbox) {
+
+  // Use the $sandbox to store the information needed to track progression between successive calls.
+  if (!isset($sandbox['progress'])) {
+
+    // Initialize the progress counter.
+    $sandbox['progress'] = 0;
+
+    // Count the number of orders in total.
+    $query = db_select('commerce_order', 'co');
+    $query->addField('co', 'order_id');
+    $sandbox['max'] = $query->countQuery()->execute()->fetchField();
+  }
+
+  // Update 50 at a time.
+  $limit = 50;
+
+  // Retrieve the next group of orders.
+  $query = db_select('commerce_order', 'co');
+  $query->fields('co');
+  $query->range($sandbox['progress'], $limit);
+  $result = $query->execute();
+
+  // Process the next chunk.
+  foreach ($result as $order) {
+
+    // Increment the progress counter.
+    $sandbox['progress']++;
+
+    // If the record doesn't have an order id, skip it.
+    if (empty($order->order_id)) {
+      continue;
+    }
+
+    // Figure out what the pickup location name is for this order.
+    $pickup_name = NULL;
+    $query = db_select('field_data_commerce_line_items', 'fdcli');
+    $query->join('commerce_line_item', 'cli', 'fdcli.commerce_line_items_line_item_id = cli.line_item_id');
+    $query->addField('cli', 'data');
+    $query->condition('cli.type', 'shipping');
+    $query->condition('fdcli.deleted', 0);
+    $query->condition('cli.order_id', $order->order_id);
+    $query->orderBy('fdcli.delta', 'DESC');
+    $query->range(0, 1);
+    $data = unserialize($query->execute()->fetchField());
+    if (!empty($data['shipping_service']) && $data['shipping_service']['shipping_method'] == 'pickup') {
+      $pickup_name = $data['shipping_service']['name'];
+    }
+
+    // If a pickup name wasn't found, skip this order.
+    if (empty($pickup_name)) {
+      continue;
+    }
+
+    // Load the order total records from {field_data_commerce_order_total}.
+    $query = db_select('field_data_commerce_order_total', 'fdcot');
+    $query->fields('fdcot');
+    $query->condition('entity_type', 'commerce_order');
+    $query->condition('bundle', 'commerce_order');
+    $query->condition('entity_id', $order->order_id);
+    $result = $query->execute();
+
+    // Iterate through the fields.
+    foreach ($result as $order_total) {
+
+      // Unserialize the data.
+      $order_total->commerce_order_total_data = unserialize($order_total->commerce_order_total_data);
+
+      // Iterate through the components.
+      if (!empty($order_total->commerce_order_total_data['components'])) {
+        foreach ($order_total->commerce_order_total_data['components'] as &$component) {
+
+          // If the componenet name is 'pickup', replace it with the new name.
+          if ($component['name'] == 'pickup') {
+            $component['name'] = $pickup_name;
+          }
+        }
+      }
+
+      // Save the record.
+      drupal_write_record('field_data_commerce_order_total', $order_total, array('entity_type', 'entity_id', 'revision_id', 'deleted', 'delta', 'language'));
+    }
+
+    // Load the order total revision records from {field_revision_commerce_order_total}.
+    $query = db_select('field_revision_commerce_order_total', 'frcot');
+    $query->fields('frcot');
+    $query->condition('entity_type', 'commerce_order');
+    $query->condition('bundle', 'commerce_order');
+    $query->condition('entity_id', $order->order_id);
+    $result = $query->execute();
+
+    // Iterate through the fields.
+    foreach ($result as $order_total_rev) {
+
+      // Unserialize the data.
+      $order_total_rev->commerce_order_total_data = unserialize($order_total_rev->commerce_order_total_data);
+
+      // Iterate through the components.
+      if (!empty($order_total_rev->commerce_order_total_data['components'])) {
+        foreach ($order_total_rev->commerce_order_total_data['components'] as &$component) {
+
+          // If the componenet name is 'pickup', replace it with the new name.
+          if ($component['name'] == 'pickup') {
+            $component['name'] = $pickup_name;
+          }
+        }
+      }
+
+      // Save the record.
+      drupal_write_record('field_data_commerce_order_total', $order_total_rev, array('entity_type', 'entity_id', 'revision_id', 'deleted', 'delta', 'language'));
+    }
+  }
+
+  // Determine if we're finished or not.
+  $sandbox['#finished'] = $sandbox['progress'] / $sandbox['max'];
+}
+

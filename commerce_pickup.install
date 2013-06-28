@@ -64,8 +64,6 @@ function commerce_pickup_uninstall() {
   // Delete variables.
   variable_del('commerce_pickup_location_entity');
   variable_del('commerce_pickup_service_display_title');
-  variable_del('commerce_pickup_location_list_element');
-  variable_del('commerce_pickup_location_list_description');
 }
 
 /**
@@ -392,5 +390,13 @@ function commerce_pickup_update_7003(&$sandbox) {
 
   // Determine if we're finished or not.
   $sandbox['#finished'] = $sandbox['progress'] / $sandbox['max'];
+}
+
+/**
+ * Remove old variables.
+ */
+function commerce_pickup_update_7004(&$sandbox) {
+  variable_del('commerce_pickup_location_list_element');
+  variable_del('commerce_pickup_location_list_description');
 }
 

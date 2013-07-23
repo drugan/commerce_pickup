@@ -169,6 +169,12 @@ function commerce_pickup_update_7002(&$sandbox) {
     $sandbox['max'] = $query->countQuery()->execute()->fetchField();
   }
 
+  // If there are no line items, bail.
+  if (empty($sandbox['max'])) {
+    $sandbox['#finished'] = 1;
+    return;
+  }
+
   // Update 50 at a time.
   $limit = 50;
 
@@ -287,6 +293,12 @@ function commerce_pickup_update_7003(&$sandbox) {
     $query = db_select('commerce_order', 'co');
     $query->addField('co', 'order_id');
     $sandbox['max'] = $query->countQuery()->execute()->fetchField();
+  }
+
+  // If there are no orders, bail.
+  if (empty($sandbox['max'])) {
+    $sandbox['#finished'] = 1;
+    return;
   }
 
   // Update 50 at a time.

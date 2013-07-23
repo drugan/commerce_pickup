@@ -15,13 +15,16 @@
 function commerce_pickup_menu() {
 
   // Commerce pickup settings page.
-  $items['admin/commerce/config/pickup'] = array(
-    'title' => 'Pickup Settings',
+  $items['admin/commerce/config/shipping/methods/pickup/edit'] = array(
+    'title' => 'Edit',
     'description' => 'Commerce Pickup shipping method settings.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('commerce_pickup_settings_form'),
-    'access arguments' => array('administer store configuration'),
+    'access arguments' => array('administer shipping'),
     'file' => 'commerce_pickup.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+    'weight' => 0,
   );
 
   return $items;

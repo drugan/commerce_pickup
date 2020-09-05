@@ -114,7 +114,7 @@ function commerce_pickup_commerce_shipping_service_info() {
 
     // Split the entity/bundle into two separate variables.
     $split = explode('__', $entity_bundle);
-    if (count($split == 2)) {
+    if (count($split) == 2) {
       $entity_type = $split[0];
       $bundle = $split[1];
     }

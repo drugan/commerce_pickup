@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.pickup_gmap
+    - profile.type.pickup
+id: profile.pickup.pickup_gmap
+field_name: pickup_gmap
+entity_type: profile
+bundle: pickup
+label: 'Pickup Coogle map'
+description: 'The address value for this field will fetched from the <em>Pickup point</em> field so the only thing you need to do is to configure the <em>Google Map from one-line address</em> formatter on the <em>Pickup checkout</em> view mode (requires the <a href="https://www.drupal.org/project/simple_gmap">Simple Google Maps</a> module).'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

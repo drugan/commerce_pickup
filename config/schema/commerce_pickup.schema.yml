@@ -1,0 +1,18 @@
+action.configuration.commerce_pickup_duplicate:
+  type: action_configuration_default
+  label: 'Configuration for the Duplicate pickup point action'
+action.configuration.commerce_pickup_addresses:
+  type: action_configuration_default
+  label: 'Configuration for the Edit pickup addresses action'
+action.configuration.commerce_pickup_default:
+  type: action_configuration_default
+  label: 'Configuration for the Set default pickup pickup action'
+action.configuration.commerce_pickup_hours:
+  type: action_configuration_default
+  label: 'Configuration for the Edit pickup hours action'
+action.configuration.commerce_pickup_stores:
+  type: action_configuration_default
+  label: 'Configuration for the Edit pickup stores action'
+action.configuration.commerce_pickup_components:
+  type: action_configuration_default
+  label: 'Configuration for the Edit pickup components action'

@@ -1,0 +1,5 @@
+entity.profile_pickup.collection:
+  route_name: view.pickup_points.admin_page
+  base_route: entity.user.collection
+  title: 'Pickup profiles'
+  weight: 10

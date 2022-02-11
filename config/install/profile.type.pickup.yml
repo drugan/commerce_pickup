@@ -1,0 +1,12 @@
+langcode: en
+status: true
+dependencies: {  }
+id: pickup
+label: Pickup
+display_label: null
+multiple: true
+registration: false
+roles:
+  - pickup_vendor
+allow_revisions: false
+new_revision: false

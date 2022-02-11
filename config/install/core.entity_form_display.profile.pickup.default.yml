@@ -1,0 +1,46 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.profile.pickup.pickup_gmap
+    - field.field.profile.pickup.pickup_address
+    - field.field.profile.pickup.pickup_hours
+    - field.field.profile.pickup.pickup_stores
+    - field.field.profile.pickup.pickup_timezone
+    - profile.type.pickup
+  module:
+    - address
+    - office_hours
+    - tzfield
+id: profile.pickup.default
+targetEntityType: profile
+bundle: pickup
+mode: default
+content:
+  pickup_address:
+    type: address_default
+    weight: 2
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  pickup_hours:
+    weight: 3
+    settings: {  }
+    third_party_settings: {  }
+    type: office_hours_default
+    region: content
+  pickup_stores:
+    type: options_select
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  pickup_timezone:
+    type: tzfield_default
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  pickup_gmap: true
+  is_default: true

@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_store
+    - profile
+id: profile.pickup_stores
+field_name: pickup_stores
+entity_type: profile
+type: entity_reference
+settings:
+  target_type: commerce_store
+module: core
+locked: true
+cardinality: -1
+translatable: false
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

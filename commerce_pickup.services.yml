@@ -1,0 +1,9 @@
+services:
+  commerce_pickup.options_manager:
+    class: Drupal\commerce_pickup\PickupOptionsmanager
+    arguments: ['@entity_type.manager', '@tempstore.shared']
+  commerce_pickup.event_subscriber:
+    class: Drupal\commerce_pickup\EventSubscriber\PickupOrderEventSubscriber
+    arguments: ['@commerce_pickup.options_manager']
+    tags:
+      - { name: event_subscriber }

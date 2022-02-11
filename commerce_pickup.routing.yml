@@ -1,0 +1,56 @@
+commerce_pickup.config_action_pickup_addresses:
+  path: '/pickup/action/pickup-addresses'
+  defaults:
+    _title: 'Edit pickup addresses'
+    _form: 'Drupal\commerce_pickup\Form\ConfigActionPickupAddresses'
+  requirements:
+    _permission: 'update own pickup profile'
+
+commerce_pickup.config_action_pickup_default:
+  path: '/pickup/action/pickup-default'
+  defaults:
+    _title: 'Mark pickup point as default'
+    _form: 'Drupal\commerce_pickup\Form\ConfigActionPickupDefault'
+  requirements:
+    _permission: 'update own pickup profile'
+
+commerce_pickup.config_action_pickup_duplicate:
+  path: '/pickup/action/pickup-duplicate'
+  defaults:
+    _title: 'Duplicate pickup point'
+    _form: 'Drupal\commerce_pickup\Form\ConfigActionPickupDuplicate'
+  requirements:
+    _permission: 'create pickup profile'
+
+commerce_pickup.config_action_pickup_hours:
+  path: '/pickup/action/pickup-hours'
+  defaults:
+    _title: 'Edit pickup hours'
+    _form: 'Drupal\commerce_pickup\Form\ConfigActionPickupHours'
+  requirements:
+    _permission: 'update own pickup profile'
+
+commerce_pickup.config_action_pickup_stores:
+  path: '/pickup/action/pickup-stores'
+  defaults:
+    _title: 'Edit pickup stores'
+    _form: 'Drupal\commerce_pickup\Form\ConfigActionPickupStores'
+  requirements:
+    _permission: 'update own pickup profile'
+
+commerce_pickup.config_action_pickup_components:
+  path: '/pickup/action/pickup-components'
+  defaults:
+    _title: 'Edit pickup components'
+    _form: 'Drupal\commerce_pickup\Form\ConfigActionPickupComponents'
+  requirements:
+    _permission: 'update own pickup profile'
+
+# commerce_pickup.config_action_pickup_api:
+#   path: '/pickup/action/pickup-api'
+#   defaults:
+#     _title: 'Creaate from API'
+#     _form: 'Drupal\commerce_pickup\Form\ConfigActionPickupApi'
+#   requirements:
+#     _permission: 'create pickup profile'
+

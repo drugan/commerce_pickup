@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_pickup
+id: commerce_pickup_hours
+label: 'Edit pickup hours'
+type: profile
+plugin: commerce_pickup_hours
+configuration: {  }

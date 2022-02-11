@@ -1,8 +1,0 @@
-name = Commerce Pickup
-description = Allows you to define pickup locations for customers to choose during checkout.
-package = Commerce (shipping)
-dependencies[] = commerce
-dependencies[] = commerce_line_item
-dependencies[] = commerce_order
-dependencies[] = commerce_shipping
-core = 7.x

@@ -1,0 +1,15 @@
+langcode: en
+status: true
+dependencies: {  }
+id: pickup_vendor
+label: 'Pickup vendor'
+weight: 5
+is_admin: null
+permissions:
+  - 'create pickup profile'
+  - 'delete own pickup profile'
+  - 'update own pickup profile'
+  - 'view commerce_store'
+  - 'view own pickup profile'
+  - 'view own profile'
+  - 'view own unpublished profile'

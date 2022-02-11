@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.pickup_hours
+    - profile.type.pickup
+  module:
+    - office_hours
+id: profile.pickup.pickup_hours
+field_name: pickup_hours
+entity_type: profile
+bundle: pickup
+label: 'Pickup point hours'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: null
+settings: {  }
+field_type: office_hours

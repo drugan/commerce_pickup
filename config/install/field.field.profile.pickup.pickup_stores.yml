@@ -1,0 +1,24 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.pickup_stores
+    - profile.type.pickup
+id: profile.pickup.pickup_stores
+field_name: pickup_stores
+entity_type: profile
+bundle: pickup
+label: 'Pickup point stores'
+description: 'To select / unselect multiple options press <strong>Ctrl</strong> or <strong>Shift</strong> key.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: null
+settings:
+  handler: views
+  handler_settings:
+    view:
+      view_name: pickup_stores
+      display_name: store_reference
+      arguments: {  }
+field_type: entity_reference

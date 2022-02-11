@@ -1,0 +1,6 @@
+view.pickup_points.user_page.add_form:
+  route_name: profile.user_page.add_form
+  title: 'Add pickup point'
+  appears_on:
+    - view.pickup_points.user_page
+  class: '\Drupal\profile\Plugin\Menu\LocalAction\ProfileLocalAction'

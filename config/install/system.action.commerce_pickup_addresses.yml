@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_pickup
+id: commerce_pickup_addresses
+label: 'Edit pickup addresses'
+type: profile
+plugin: commerce_pickup_addresses
+configuration: {  }

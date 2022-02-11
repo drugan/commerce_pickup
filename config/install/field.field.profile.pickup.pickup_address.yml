@@ -1,0 +1,34 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.pickup_address
+    - profile.type.pickup
+  module:
+    - address
+id: profile.pickup.pickup_address
+field_name: pickup_address
+entity_type: profile
+bundle: pickup
+label: 'Pickup point'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: null
+settings:
+  available_countries: {  }
+  langcode_override: ''
+  field_overrides:
+    givenName:
+      override: optional
+    additionalName:
+      override: hidden
+    familyName:
+      override: optional
+    organization:
+      override: required
+    addressLine2:
+      override: hidden
+  fields: {  }
+field_type: address

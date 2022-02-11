@@ -1,0 +1,10 @@
+name: Commerce Pickup
+type: module
+description: Allows you to define pickup locations for customers to choose during checkout.
+package: Commerce (contrib)
+core_version_requirement: ^8.8 || ^9
+dependencies:
+  - commerce:commerce
+  - commerce_shipping:commerce_shipping
+  - office_hours:office_hours
+  - tzfield:tzfield

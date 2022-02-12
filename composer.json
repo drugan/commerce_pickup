@@ -1,0 +1,18 @@
+{
+  "name": "drupal/commerce_pickup",
+  "type": "drupal-module",
+  "description": "WIP",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/commerce_pickup",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/commerce_pickup",
+    "source": "https://git.drupalcode.org/project/commerce_pickup"
+  },
+  "require": {
+    "drupal/commerce_shipping": "^2.0",
+    "drupal/office_hours": "^1.0",
+    "drupal/tzfield": "^1.0"
+  }
+}
